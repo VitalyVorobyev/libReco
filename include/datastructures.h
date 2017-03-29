@@ -1,4 +1,3 @@
-#include "data_str_dict.h"
 #include "EvtInfo.h"
 #include "EvtShape.h"
 #include "GammaInfo.h"
@@ -10,4 +9,6 @@
 #include "Pi0Info.h"
 #include "SFWMInfo.h"
 #include "TrackInfo.h"
+#include "TrackInfo2.h"
 #include "VertexInfo.h"
+#include "H0Info.h"

@@ -4,7 +4,7 @@
 ClassImp(TrackInfo)
 
 void TrackInfo::Clear(void){
-  p[0] = -99, p[1] = -99, p[3] = -99;   // Momentum
+  p[0] = -99, p[1] = -99, p[2] = -99;   // Momentum
   r = -99, z = -99;         // Impact parameters
   rz_svd = -1, rphi_svd = -1;// SVD hits
   atckpi = -2;       // Identification
