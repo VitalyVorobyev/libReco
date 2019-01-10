@@ -1,6 +1,8 @@
-#include <cmath>
-
 #include "recotools.h"
+
+#include <cmath>
+//#include <iostream>
+
 #include "uisetter.h"
 
 #include "benergy/BeamEnergy.h"
@@ -17,6 +19,9 @@
 #include "toolbox/FuncPtr.h"
 #include "toolbox/FoxWolfr.h"
 #include "toolbox/Thrust.h"
+
+//using std::cout;
+//using std::endl;
 
 #if defined(BELLE_NAMESPACE)
 namespace Belle {
@@ -333,11 +338,18 @@ int RTools::GetTrueVertices(const Gen_hepevt& sigb,
     return 0;
 }
 
+double RTools::DecayZ(const Gen_hepevt& p, const vector<Gen_hepevt>& mcl) {
+    return mcl[p.da(1)].V(3);
+}
+
 const Gen_hepevt& RTools::OtherB(const Gen_hepevt& sigb,
                                  const vector<Gen_hepevt>& mcl) {
-    const int sigid = sigb.idhep();
-    for (unsigned i = 0; i < mcl.size(); i++)
-        if (mcl[i].idhep() == -sigid) return mcl[i];
+    const int sigid = abs(sigb.idhep());
+    for (vector<Gen_hepevt>::const_iterator cand = mcl.begin();
+         cand != mcl.end(); cand++) {
+        if ((abs(cand->idhep()) == sigid) &&
+            (sigb.daFirst() != cand->daFirst())) return *cand;
+    }
     return sigb;
 }
 
@@ -446,10 +458,15 @@ void RTools::FillBVtx(const B0UserInfo& binfo,
 }
 
 void RTools::FillTrk(const Particle& trk,TrackInfo& info) {
+//    cout << "FillTrk" << endl;
     info.p[0] = trk.p().x();
     info.p[1] = trk.p().y();
     info.p[2] = trk.p().z();
+//    cout << "  momentum filled" << endl;
+
     const TrkUserInfo& trkinfo = static_cast<const TrkUserInfo&>(trk.userInfo());
+//    cout << "  user info ready" << endl;
+
     info.z        = trkinfo.z();
     info.r        = trkinfo.r();
     info.rz_svd   = trkinfo.rz_svd_hits();
@@ -458,6 +475,7 @@ void RTools::FillTrk(const Particle& trk,TrackInfo& info) {
     info.atckp    = trkinfo.atckp();
     info.eid      = trkinfo.eid();
     info.muid     = trkinfo.muid();
+//    cout << "  done" << endl;
 }
 
 void RTools::FillTrk(const Particle& trk, TrackInfo2& info) {
@@ -477,9 +495,9 @@ void RTools::FillTrk(const Particle& trk, TrackInfo2& info) {
 }
 
 void RTools::FillH0(const Particle& h, H0Info& info) {
-    info.p = h.p().rho();
+    info.p     = h.p().rho();
     info.costh = h.p().cosTheta();
-    info.phi = h.p().phi();
+    info.phi   = h.p().phi();
 }
 
 void RTools::FillGamma(const Particle& g, GammaInfo& info) {

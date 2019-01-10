@@ -11,10 +11,7 @@ namespace Belle {
 class B0UserInfo : public BUserInfo {
  public:
     B0UserInfo();
-    B0UserInfo(const B0UserInfo &);
-    virtual ~B0UserInfo();
     B0UserInfo * clone(void) const;
-    B0UserInfo & operator = (const B0UserInfo &);
 
  public:
     void CosTheta(const double& v) {m_cos_theta = v;}
@@ -138,12 +135,6 @@ class B0UserInfo : public BUserInfo {
     int m_tag_ndf;
 
     double m_vtx_chi2;
-    double m_z_sig_d0, m_sz_sig_d0, m_chisq_sig_d0;
-    int m_ndf_sig_d0, m_ntrk_sig_d0;
-    double m_z_sig_pipi, m_sz_sig_pipi, m_chisq_sig_pipi;
-    int m_ndf_sig_pipi, m_ntrk_sig_pipi;
-    double m_z_sig_noip, m_sz_sig_noip, m_chisq_sig_noip;
-    int m_ndf_sig_noip, m_ntrk_sig_noip;
 
     double m_z_sig;
     double m_z_asc;

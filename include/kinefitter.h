@@ -30,7 +30,6 @@ public:
   static int b0tod0pipi_pipivtx_fit(Particle& b0);
   static int b0tod0pipi_d0vtx_fit(Particle& b0);
 
-private:
   static int make_mother(Particle& p, kvertexfitter& kf);
   static int make_mother(Particle& p, kmassfitter& kf);
   static void errGam(HepSymMatrix& errCart, const Mdst_gamma& gamma);

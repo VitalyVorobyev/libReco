@@ -3,17 +3,17 @@
 
 #include "TObject.h"
 
-class EvtInfo : public TObject{
-public:
-  EvtInfo(void) { Clear();}
-  void Clear();
+class EvtInfo : public TObject {
+ public:
+    EvtInfo(void);
+    void Clear();
 
-  int exp;
-  int run;
-  int evtn;
+    int exp;
+    int run;
+    int evtn;
 
-  int SVD(void) const;
-  ClassDef(EvtInfo,1)
+    int SVD(void) const;
+    ClassDef(EvtInfo, 1)
 };
 
 #ifdef __MAKECINT__

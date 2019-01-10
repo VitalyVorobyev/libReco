@@ -93,6 +93,8 @@ class RTools {
     static double cos_bwd_gap;
     static const Gen_hepevt& OtherB(const Gen_hepevt& sigb,
                                     const std::vector<Gen_hepevt>& mcl);
+    static double DecayZ(const Gen_hepevt& p,
+                         const std::vector<Gen_hepevt>& mcl);
 
  private:
     /** make lists of track/gamma in signal_b (all charged tracks as pi) **/
