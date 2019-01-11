@@ -26,4 +26,3 @@ double TrackInfo2::py(void) const { return pt() * sin(phi);}
 #ifdef __MAKECINT__
 #pragma link C++ class TrackInfo2;
 #endif
-

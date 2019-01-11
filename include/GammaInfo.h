@@ -8,13 +8,10 @@ public:
   GammaInfo(void) { Clear();}
   void Clear(void);
 
-  double p[3];
+  double e;
+  double costh;
 
-  double P(void)     const;
-  double pt(void)    const;
-  double costh(void) const;
-
-  ClassDef(GammaInfo,1)
+  ClassDef(GammaInfo, 2)
 };
 
 #ifdef __MAKECINT__

@@ -41,7 +41,8 @@ public:
 
   void Mode(const int v) {m_mode = v;}
   int  Mode(void) const {return m_mode;}
-private:
+
+ private:
   double m_mass;
 
   bool   m_vfit_done;

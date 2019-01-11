@@ -55,6 +55,19 @@ const double dmdsst = 0.1438;
 const double dmdst0 = 0.14212;
 const double dmdst  = 0.1454257;
 
+const int B0ID    = 511;
+const int DsID    = 431;
+const int DsstID  = 433;
+const int D0ID    = 421;
+const int D0stID  = 423;
+const int DstID   = 413;
+const int GamID   = 22;
+const int Pi0ID   = 111;
+const int PiID    = 211;
+const int EtaID   = 221;
+const int OmegaID = 223;
+const int DsjID   = 10411;
+
 map<string, vector<double>> CMB::cutSym;
 map<string, vector<double>> CMB::cutAsym;
 map<string, double> CMB::par;
@@ -84,6 +97,18 @@ void CMB::init() {
 void appendMove(pvec& to, pvec& from) {
     to.insert(to.end(), make_move_iterator(from.begin()), make_move_iterator(from.end()));
     from.clear();
+}
+
+void CMB::checkPLM(PLM& plm, const string& pcl) {
+    if (plm.find(pcl) == plm.end())
+        plm[pcl] = pvec();
+}
+
+void CMB::checkPLM(PLM& plm, const string& pcl1, const string& pcl2) {
+    if (plm.find(pcl1) == plm.end()) {
+        plm[pcl1] = pvec();
+        plm[pcl2] = pvec();
+    }
 }
 
 void CMB::massCutSym(pvec &v, const string& key) {
@@ -401,7 +426,7 @@ int CMB::make_etato2g(pvec& etal, pvec& gammas, int mode) {
 // eta -> gamma gamma
     gammas.clear();
     makeGamma(gammas); withPCut(gammas, par["Emin(gamma from eta)"]);
-    combination(etal, Ptype(221), gammas, gammas);
+    combination(etal, Ptype(EtaID), gammas, gammas);
     massCutSym(etal, "m(eta -> gg)");
     if (m_tupfl) {
         UIS::Seth0lInfo(etal);
@@ -413,7 +438,7 @@ int CMB::make_etato2g(pvec& etal, pvec& gammas, int mode) {
 
 int CMB::make_etato3pi(pvec& etal, pvec& pipl, pvec& piml, pvec& pi0l, int mode) {
     etal.clear();
-    combination(etal, Ptype(221), pipl, piml, pi0l);
+    combination(etal, Ptype(EtaID), pipl, piml, pi0l);
     massCutSym(etal, "m(eta -> ppp)");
     if (m_tupfl) {
         UIS::Seth0lInfo(etal);
@@ -425,7 +450,7 @@ int CMB::make_etato3pi(pvec& etal, pvec& pipl, pvec& piml, pvec& pi0l, int mode)
 int CMB::make_omega(pvec& omegal, pvec& pipl, pvec& piml, pvec& pi0l) {
     omegal.clear();
 // omega -> pi+ pi- pi0
-    combination(omegal, Ptype(223), pipl, piml, pi0l);
+    combination(omegal, Ptype(OmegaID), pipl, piml, pi0l);
     massCutSym(omegal, "m(omega)");
     if (m_tupfl) UIS::Seth0lInfo(omegal);
     return omegal.size();
@@ -496,8 +521,8 @@ int CMB::make_dstoh0hp(pvec &dsl, pvec &h0l, pvec &hpl, pvec &hml, int mode) {
 int CMB::make_dstoh0hp(pvec &dspl, pvec &dsml, pvec &h0l,
                        pvec &hpl, pvec &hml, int mode) {
     dspl.clear(); dsml.clear();
-    combination(dspl, Ptype( 431), h0l, hpl);
-    combination(dsml, Ptype(-431), h0l, hml);
+    combination(dspl, Ptype( DsID), h0l, hpl);
+    combination(dsml, Ptype(-DsID), h0l, hml);
     massCutSym(dspl, "m(Ds+)");
     massCutSym(dsml, "m(Ds+)");
     if (m_tupfl) {
@@ -520,8 +545,8 @@ int CMB::make_dstoKK(pvec &dsl, pvec &kst0bl, pvec &kpl,
 int CMB::make_dstoKK(pvec &dspl, pvec &dsml, pvec &kst0bl, pvec &kpl,
                      pvec &kst0l, pvec &kml, int mode) {
     dspl.clear(); dsml.clear();
-    combination(dspl, Ptype(431), kst0bl, kpl);
-    combination(dsml, Ptype(-431), kst0l, kml);
+    combination(dspl, Ptype(DsID), kst0bl, kpl);
+    combination(dsml, Ptype(-DsID), kst0l, kml);
     massCutSym(dspl, "m(Ds+)");
     massCutSym(dsml, "m(Ds+)");
     if (m_tupfl) {
@@ -546,8 +571,8 @@ int CMB::make_dsstar(PLM& plm, bool separate) {
 int CMB::make_dsstar(pvec &dsstl, pvec &dsl, pvec &gammal) {
     dsstl.clear();
     if (!dsl.size() || !gammal.size()) return 0;
-    combination(dsstl, dsl[0].pType().charge() > 0 ? Ptype(433) :
-                                                     Ptype(-433), dsl, gammal);
+    combination(dsstl, dsl[0].pType().charge() > 0 ? Ptype(DsstID) :
+                                                    Ptype(-DsstID), dsl, gammal);
     dmassCutSym(dsstl, "dm(Ds*)");
     return dsstl.size();
 }
@@ -557,23 +582,23 @@ int CMB::make_dstar(pvec &dstl, pvec &dl, pvec &xl) {
     if (!dl.size() || !xl.size()) return 0;
     int dstlund = 0;
     string key;
-    if (dl[0].lund() == 431 && xl[0].lund() == 22) {
-        dstlund =  433;  // D_s*+ -> Ds+ gamma
+    if (dl[0].lund() == DsID && xl[0].lund() == GamID) {
+        dstlund = DsstID;  // D_s*+ -> Ds+ gamma
         key = "dm(Ds*)";
-    } else if (dl[0].lund() == -431 && xl[0].lund() == 22) {
-        dstlund = -433;  // D_s*- -> Ds- gamma
+    } else if (dl[0].lund() == -DsID && xl[0].lund() == GamID) {
+        dstlund = -DsstID;  // D_s*- -> Ds- gamma
         key = "dm(Ds*)";
-    } else if (dl[0].lund() ==  421 && xl[0].lund() == 111) {
-        dstlund = 423;  // D*0 -> D0 pi0
+    } else if (dl[0].lund() ==  D0ID && xl[0].lund() == Pi0ID) {
+        dstlund = D0stID;  // D*0 -> D0 pi0
         key = "dm(D*0)";
-    } else if (dl[0].lund() == -421 && xl[0].lund() == 111) {
-        dstlund = -423;  // anti-D*0 -> anti-D0 pi0
+    } else if (dl[0].lund() == -D0ID && xl[0].lund() == Pi0ID) {
+        dstlund = -D0stID;  // anti-D*0 -> anti-D0 pi0
         key = "dm(D*0)";;
-    } else if (abs(dl[0].lund()) == 421 && xl[0].lund() ==  211) {
-        dstlund = 413;  // D*+ -> D0 pi+
+    } else if (abs(dl[0].lund()) == D0ID && xl[0].lund() ==  PiID) {
+        dstlund = DstID;  // D*+ -> D0 pi+
         key = "dm(D*)";
-    } else if (abs(dl[0].lund()) == 421 && xl[0].lund() == -211) {
-        dstlund = -413;  // D*- -> anti-D0 pi-
+    } else if (abs(dl[0].lund()) == D0ID && xl[0].lund() == -PiID) {
+        dstlund = -DstID;  // D*- -> anti-D0 pi-
         key = "dm(D*)";
     } else {
         cerr << "CMB::make_dstar: wrong particles "
@@ -588,10 +613,7 @@ int CMB::make_dstar(pvec &dstl, pvec &dl, pvec &xl) {
 
 // D*sj -> Ds gamma
 int CMB::make_dsjtodsgamma(PLM& plm, bool separate, int mode) {
-    if (plm.find("Dsj+") == plm.end()) {
-        plm["Dsj+"] = pvec();
-        plm["Dsj-"] = pvec();
-    }
+    checkPLM(plm, "Dsj+", "Dsj-");
     if (plm.find("gamma") == plm.end()) make_gamma(plm);
     pvec dsjp, dsjm;
     make_dsjtodsx(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["gamma"], mode);
@@ -600,12 +622,32 @@ int CMB::make_dsjtodsgamma(PLM& plm, bool separate, int mode) {
     return plm["Dsj+"].size() + plm["Dsj-"].size();
 }
 
+// D*sj -> Ds gamma gamma
+int CMB::make_dsjtods2gamma(PLM& plm, bool separate, int mode) {
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("gamma") == plm.end()) make_gamma(plm);
+    pvec dsjp, dsjm;
+    make_dsjtodsxy(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["gamma"], plm["gamma"], mode);
+    appendMove(plm["Dsj+"], dsjp);
+    appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
+    return plm["Dsj+"].size() + plm["Dsj-"].size();
+}
+
+// D*sj -> Ds pi0 gamma
+int CMB::make_dsjtodspi0gamma(PLM& plm, bool separate, int mode) {
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("gamma") == plm.end()) make_gamma(plm);
+    if (plm.find("pi0") == plm.end())   make_pi0(plm);
+    pvec dsjp, dsjm;
+    make_dsjtodsxy(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["pi0"], plm["gamma"], mode);
+    appendMove(plm["Dsj+"], dsjp);
+    appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
+    return plm["Dsj+"].size() + plm["Dsj-"].size();
+}
+
 // D*sj -> Ds pi0
 int CMB::make_dsjtodspi0(PLM& plm, bool separate, int mode) {
-    if (plm.find("Dsj+") == plm.end()) {
-        plm["Dsj+"] = pvec();
-        plm["Dsj-"] = pvec();
-    }
+    checkPLM(plm, "Dsj+", "Dsj-");
     if (plm.find("pi0") == plm.end()) make_pi0(plm);
     pvec dsjp, dsjm;
     make_dsjtodsx(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["pi0"], mode);
@@ -616,10 +658,7 @@ int CMB::make_dsjtodspi0(PLM& plm, bool separate, int mode) {
 
 // D*sj -> Ds pi+ pi-
 int CMB::make_dsjtodspipi(PLM& plm, bool separate, int mode) {
-    if (plm.find("Dsj+") == plm.end()) {
-        plm["Dsj+"] = pvec();
-        plm["Dsj-"] = pvec();
-    }
+    checkPLM(plm, "Dsj+", "Dsj-");
     if (plm.find("pi+") == plm.end()) make_kpi(plm);
     pvec dsjp, dsjm;
     make_dsjtodsxy(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["pi+"], plm["pi-"], mode);
@@ -628,14 +667,46 @@ int CMB::make_dsjtodspipi(PLM& plm, bool separate, int mode) {
     return plm["Dsj+"].size() + plm["Dsj-"].size();
 }
 
+// D*sj -> Ds pi+ pi- gamma
+int CMB::make_dsjtodspipigamma(PLM& plm, bool separate, int mode) {
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("pi+") == plm.end()) make_kpi(plm);
+    if (plm.find("gamma") == plm.end()) make_gamma(plm);
+    pvec dsjp, dsjm;
+    make_dsjtodsxyz(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["pi+"], plm["pi-"], plm["gamma"], mode);
+    appendMove(plm["Dsj+"], dsjp);
+    appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
+    return plm["Dsj+"].size() + plm["Dsj-"].size();
+}
+
+// D*sj -> Ds pi0 pi0
+int CMB::make_dsjtods2pi0(PLM& plm, bool separate, int mode) {
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("pi0") == plm.end()) make_pi0(plm);
+    pvec dsjp, dsjm;
+    make_dsjtodsxy(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["pi0"], plm["pi0"], mode);
+    appendMove(plm["Dsj+"], dsjp);
+    appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
+    return plm["Dsj+"].size() + plm["Dsj-"].size();
+}
+
+// D*sj -> Ds pi0 pi0 gamma
+int CMB::make_dsjtods2pi0gamma(PLM& plm, bool separate, int mode) {
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("gamma") == plm.end()) make_gamma(plm);
+    if (plm.find("pi0") == plm.end()) make_pi0(plm);
+    pvec dsjp, dsjm;
+    make_dsjtodsxyz(dsjp, dsjm, plm["Ds+"], plm["Ds-"], plm["pi0"], plm["pi0"], plm["gamma"], mode);
+    appendMove(plm["Dsj+"], dsjp);
+    appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
+    return plm["Dsj+"].size() + plm["Dsj-"].size();
+}
+
 // D*sj -> Ds* gamma
 int CMB::make_dsjtodsstgamma(PLM& plm, bool separate, int mode) {
-    if (plm.find("Dsj+") == plm.end()) {
-        plm["Dsj+"] = pvec();
-        plm["Dsj-"] = pvec();
-    }
+    checkPLM(plm, "Dsj+", "Dsj-");
     if (plm.find("gamma") == plm.end()) make_gamma(plm);
-    if (plm.find("Ds*+") == plm.end()) make_dsstar(plm, separate);
+    if (plm.find("Ds*+")  == plm.end()) make_dsstar(plm, separate);
 
     pvec dsjp, dsjm;
     make_dsjtodsx(dsjp, dsjm, plm["Ds*+"], plm["Ds*-"], plm["gamma"], mode);
@@ -646,11 +717,8 @@ int CMB::make_dsjtodsstgamma(PLM& plm, bool separate, int mode) {
 
 // D*sj -> Ds* pi0
 int CMB::make_dsjtodsstpi0(PLM& plm, bool separate, int mode) {
-    if (plm.find("Dsj+") == plm.end()) {
-        plm["Dsj+"] = pvec();
-        plm["Dsj-"] = pvec();
-    }
-    if (plm.find("pi0") == plm.end()) make_pi0(plm);
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("pi0")  == plm.end()) make_pi0(plm);
     if (plm.find("Ds*+") == plm.end()) make_dsstar(plm, separate);
 
     pvec dsjp, dsjm;
@@ -662,11 +730,8 @@ int CMB::make_dsjtodsstpi0(PLM& plm, bool separate, int mode) {
 
 // D*sj -> Ds* pi+ pi-
 int CMB::make_dsjtodsstpipi(PLM& plm, bool separate, int mode) {
-    if (plm.find("Dsj+") == plm.end()) {
-        plm["Dsj+"] = pvec();
-        plm["Dsj-"] = pvec();
-    }
-    if (plm.find("pi+") == plm.end()) make_kpi(plm);
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("pi+")  == plm.end()) make_kpi(plm);
     if (plm.find("Ds*+") == plm.end()) make_dsstar(plm, separate);
 
     pvec dsjp, dsjm;
@@ -674,7 +739,19 @@ int CMB::make_dsjtodsstpipi(PLM& plm, bool separate, int mode) {
     appendMove(plm["Dsj+"], dsjp);
     appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
     return plm["Dsj+"].size() + plm["Dsj-"].size();
+}
 
+// D*sj -> Ds* pi0 pi0
+int CMB::make_dsjtodsst2pi0(PLM& plm, bool separate, int mode) {
+    checkPLM(plm, "Dsj+", "Dsj-");
+    if (plm.find("pi0")  == plm.end()) make_pi0(plm);
+    if (plm.find("Ds*+") == plm.end()) make_dsstar(plm, separate);
+
+    pvec dsjp, dsjm;
+    make_dsjtodsxy(dsjp, dsjm, plm["Ds*+"], plm["Ds*-"], plm["pi0"], plm["pi0"], mode);
+    appendMove(plm["Dsj+"], dsjp);
+    appendMove(plm[(separate ? "Dsj-" : "Dsj+")], dsjm);
+    return plm["Dsj+"].size() + plm["Dsj-"].size();
 }
 
 int CMB::make_dsjtodsx(pvec &dsjl, pvec &dspl, pvec &dsml, pvec &xl, int mode) {
@@ -688,11 +765,11 @@ int CMB::make_dsjtodsx(pvec &dsjpl, pvec &dsjml, pvec &dspl, pvec &dsml, pvec &x
     dsjpl.clear(); dsjml.clear();
     if (!xl.size()) return 0;
     if (dspl.size()) {
-        combination(dsjpl, Ptype(431), dspl, xl);
+        combination(dsjpl, Ptype(DsID), dspl, xl);
         massCutAsym(dsjpl, "m(Dsj)");
     }
     if (dsml.size()) {
-        combination(dsjml, Ptype(-431), dsml, xl);
+        combination(dsjml, Ptype(-DsID), dsml, xl);
         massCutAsym(dsjml, "m(Dsj)");
     }
     if (m_tupfl) {
@@ -717,11 +794,40 @@ int CMB::make_dsjtodsxy(pvec &dsjpl, pvec &dsjml, pvec &dspl,
     dsjpl.clear(); dsjml.clear();
     if (!xl.size() || !yl.size()) return 0;
     if (dspl.size()) {
-        combination(dsjpl, Ptype(431), dspl, xl, yl);
+        combination(dsjpl, Ptype(DsID), dspl, xl, yl);
         massCutAsym(dsjpl, "m(Dsj)");
     }
     if (dsml.size()) {
-        combination(dsjml, Ptype(-431), dsml, xl, yl);
+        combination(dsjml, Ptype(-DsID), dsml, xl, yl);
+        massCutAsym(dsjml, "m(Dsj)");
+    }
+    if (m_tupfl) {
+        UIS::SetDlInfo(dsjpl);
+        UIS::SetDlInfo(dsjml);
+        UIS::SetModeD(dsjpl, mode);
+        UIS::SetModeD(dsjml, mode);
+    }
+    return dsjpl.size() + dsjml.size();
+}
+
+int CMB::make_dsjtodsxyz(pvec &dsjl, pvec &dspl, pvec &dsml,
+                        pvec &xl, pvec &yl, pvec &zl, int mode) {
+    pvec dsjml;
+    make_dsjtodsxyz(dsjl, dsjml, dspl, dsml, xl, yl, zl, mode);
+    appendMove(dsjl, dsjml);
+    return dsjl.size();
+}
+
+int CMB::make_dsjtodsxyz(pvec &dsjpl, pvec &dsjml, pvec &dspl,
+                        pvec &dsml, pvec &xl, pvec &yl, pvec& zl, int mode) {
+    dsjpl.clear(); dsjml.clear();
+    if (!xl.size() || !yl.size() || !zl.size()) return 0;
+    if (dspl.size()) {
+        combination(dsjpl, Ptype(DsID), dspl, xl, yl, zl);
+        massCutAsym(dsjpl, "m(Dsj)");
+    }
+    if (dsml.size()) {
+        combination(dsjml, Ptype(-DsID), dsml, xl, yl, zl);
         massCutAsym(dsjml, "m(Dsj)");
     }
     if (m_tupfl) {
@@ -741,7 +847,7 @@ int CMB::make_b0toxy(pvec& b0l, pvec& xpl, pvec& yml, pvec& xml, pvec& ypl, int 
     if (b0flag) combination(b0l, Ptype("B0"), xpl, yml);
     if (b0bflag) {
         pvec b0bl;
-        combination(b0bl, Ptype(-511), xml, ypl);
+        combination(b0bl, Ptype(-B0ID), xml, ypl);
         appendMove(b0l, b0bl);
     }
     double mbc, de;
@@ -942,7 +1048,7 @@ int CMB::make_dststtoxyz(pvec& dststl, pvec& xl, pvec& yl, pvec& zl,
     if (!xl.size()) return 0;
     if (!yl.size()) return 0;
     if (!zl.size()) return 0;
-    combination(dststl, Ptype(10411), xl, yl, zl);
+    combination(dststl, Ptype(DsjID), xl, yl, zl);
     massCutAsym(dststl, "m(Dsj)");
     if (m_tupfl) {
         UIS::SetDlInfo(dststl);

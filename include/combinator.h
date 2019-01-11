@@ -134,7 +134,7 @@ class Combinator {
     static int make_d0tohh(
         std::vector<Particle> &d0l,  // to be filled
         std::vector<Particle> &h1l, std::vector<Particle> &h2l,
-        int mode = 21); 
+        int mode = 21);
     /// D0 -> K+ pi-
     static int make_d0tokpi(
         std::vector<Particle> &d0l,  // to be filled
@@ -190,6 +190,7 @@ class Combinator {
     static int make_dstar(
         std::vector<Particle> &dstl,  // to be filled
         std::vector<Particle> &dl, std::vector<Particle> &xl);
+
 // * Ds makers * //
     /// Ds+ -> phi pi+
     static int make_dstophipi(PLM& plm, bool separate, int mode = 0);
@@ -206,19 +207,19 @@ class Combinator {
     /// Ds+ -> phi pi+, Ks0 K+, separated flavors
     static int make_dstoh0hp(
         std::vector<Particle> &dspl, std::vector<Particle> &dsml,  // to be filled
-        std::vector<Particle> &h0l, std::vector<Particle> &hpl,
+        std::vector<Particle> &h0l,  std::vector<Particle> &hpl,
         std::vector<Particle> &hml, int mode = 0);
     /// Ds+ -> anti-K*0 K+
     static int make_dstoKK(
         std::vector<Particle> &dsl,  // to be filled
         std::vector<Particle> &kst0bl, std::vector<Particle> &kpl,  // Ds+ -> anti-K*0 K+
-        std::vector<Particle> &kst0l, std::vector<Particle> &kml,   // Ds- -> K*0 K-
+        std::vector<Particle> &kst0l,  std::vector<Particle> &kml,  // Ds- -> K*0 K-
         int mode = 1);
     /// Ds+ -> anti-K*0 K+, separated flavors
     static int make_dstoKK(
-        std::vector<Particle> &dspl, std::vector<Particle> &dsml,   // to be filled
+        std::vector<Particle> &dspl,   std::vector<Particle> &dsml, // to be filled
         std::vector<Particle> &kst0bl, std::vector<Particle> &kpl,  // Ds+ -> anti-K*0 K+
-        std::vector<Particle> &kst0l, std::vector<Particle> &kml,   // Ds- -> K*0 K-
+        std::vector<Particle> &kst0l,  std::vector<Particle> &kml,  // Ds- -> K*0 K-
         int mode = 1);
     /// Ds* -> Ds gamma
     static int make_dsstar(PLM& plm, bool separate);
@@ -234,12 +235,26 @@ class Combinator {
     static int make_dsjtodspi0(PLM& plm, bool separate, int mode = 1);
     /// D*sj -> Ds pi+ pi-
     static int make_dsjtodspipi(PLM& plm, bool separate, int mode = 2);
+    /// D*sj -> Ds pi0 pi0
+    static int make_dsjtods2pi0(PLM& plm, bool separate, int mode = 3);
+
     /// D*sj -> Ds* gamma
     static int make_dsjtodsstgamma(PLM& plm, bool separate, int mode = 10);
     /// D*sj -> Ds* pi0
     static int make_dsjtodsstpi0(PLM& plm, bool separate, int mode = 11);
     /// D*sj -> Ds* pi+ pi-
     static int make_dsjtodsstpipi(PLM& plm, bool separate, int mode = 12);
+    /// D*sj -> Ds* pi0 pi0
+    static int make_dsjtodsst2pi0(PLM& plm, bool separate, int mode = 13);
+
+    /// D*sj -> Ds gamma gamma
+    static int make_dsjtods2gamma(PLM& plm, bool separate, int mode = 10);
+    /// D*sj -> Ds pi0 gamma
+    static int make_dsjtodspi0gamma(PLM& plm, bool separate, int mode = 11);
+    /// D*sj -> Ds pi+ pi- gamma
+    static int make_dsjtodspipigamma(PLM& plm, bool separate, int mode = 12);
+    /// D*sj -> Ds pi0 pi0 gamma
+    static int make_dsjtods2pi0gamma(PLM& plm, bool separate, int mode = 13);
 
     /// D*sj -> D(*)s X
     static int make_dsjtodsx(
@@ -262,8 +277,18 @@ class Combinator {
         std::vector<Particle> &dspl, std::vector<Particle> &dsml,
         std::vector<Particle> &xl, std::vector<Particle> &yl,
         int mode = 0);
-
-  /// D** -> D pi+ pi-
+    /// D*sj -> D(*)s X1 X2 X3
+    static int make_dsjtodsxyz(
+        std::vector<Particle> &dsjl, std::vector<Particle> &dspl,
+        std::vector<Particle> &dsml, std::vector<Particle> &xl,
+        std::vector<Particle> &yl,   std::vector<Particle> &zl, int mode = 0);
+    /// D*sj -> D(*)s X1 X2 X3, separated flavors
+    static int make_dsjtodsxyz(
+        std::vector<Particle> &dsjpl, std::vector<Particle> &dsjml,
+        std::vector<Particle> &dspl,  std::vector<Particle> &dsml,
+        std::vector<Particle> &xl,    std::vector<Particle> &yl,
+        std::vector<Particle> &zl, int mode = 0);
+    /// D** -> D pi+ pi-
     static int make_dststtoxyz(
         std::vector<Particle>& dststl,
         std::vector<Particle>& xl,
@@ -281,6 +306,9 @@ class Combinator {
  private:
     static void setH0toGGErrors(std::vector<Particle>& etal);
     static void D0UIS(std::vector<Particle> &v, int mode);
+    /// Check if particle list is in PLM. If not, initialize an empty list
+    static void checkPLM(PLM& plm, const std::string& pcl);
+    static void checkPLM(PLM& plm, const std::string& pcl1, const std::string& pcl2);
 };
 
 #if defined(BELLE_NAMESPACE)
@@ -288,4 +316,3 @@ class Combinator {
 #endif
 
 #endif  // __COMBINATOR_H__
-

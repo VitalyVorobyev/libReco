@@ -44,7 +44,7 @@ using std::vector;
 typedef HepLorentzVector lvect;
 typedef Hep3Vector vect;
 
-double RTools::Helicity(const Particle& p, const int nch) {
+double RTools::Helicity(const Particle& p, int nch) {
     return Helicity(p.p(), p.child(nch).p());
 }
 
@@ -491,7 +491,6 @@ void RTools::FillTrk(const Particle& trk, TrackInfo2& info) {
     info.atckp    = trkinfo.atckp();
     info.eid      = trkinfo.eid();
     info.muid     = trkinfo.muid();
-
 }
 
 void RTools::FillH0(const Particle& h, H0Info& info) {
@@ -501,9 +500,11 @@ void RTools::FillH0(const Particle& h, H0Info& info) {
 }
 
 void RTools::FillGamma(const Particle& g, GammaInfo& info) {
-    info.p[0] = g.p().x();
-    info.p[1] = g.p().y();
-    info.p[2] = g.p().z();
+    info.e = g.p().e();
+    info.costh = g.p().cosTheta();
+//    info.p[0] = g.p().x();
+//    info.p[1] = g.p().y();
+//    info.p[2] = g.p().z();
 }
 
 void RTools::FillShape(const Particle& b, EvtShape& shape) {
